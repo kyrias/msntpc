@@ -89,9 +89,9 @@ sntp_packet * parse_response(uint8_t * response) {
 void print_response(sntp_packet * response) {
 	printf("Leap indicator: %s\n"
 	       "Version number: %" PRIu8 "\n"
-	       "Response mode: %s\n"
-	       "Stratum: %" PRIu8 "\n"
-	       "UNIX epoch: %" PRIu32 "\n",
+	       " Response mode: %s\n"
+	       "       Stratum: %" PRIu8 "\n"
+	       "    UNIX epoch: %" PRIu32 "\n",
 	         li_strings[response->li],
 	                    response->ver,
 	       mode_strings[response->mode],
@@ -102,5 +102,5 @@ void print_response(sntp_packet * response) {
 	struct tm    * timestamp_tm = localtime(&timestamp_tv.tv_sec);
 	char tmbuf[26];
 	strftime(tmbuf, sizeof(tmbuf), "%FT%T%z", timestamp_tm);
-	printf("ISO-8601: %s\n", tmbuf);
+	printf("      ISO-8601: %s\n", tmbuf);
 }
