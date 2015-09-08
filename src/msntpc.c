@@ -6,6 +6,8 @@
 #include <stdio.h> // printf, fprintf, perror
 #include <string.h> // memcpy
 #include <sys/socket.h> // socket, setsockopt, SOCK_DGRAM, sendto, recvfrom
+#include <sys/time.h> // struct timeval
+#include <time.h> // localtime, strftime, struct tm
 #include <unistd.h> // close
 
 #include "msntpc.h"
@@ -90,4 +92,10 @@ void print_response(sntp_packet * response) {
 	printf("Response mode: %s\n", mode_strings[response->mode]);
 	printf("Stratum: %" PRIu8 "\n", response->stratum);
 	printf("UNIX epoch: %" PRIu32 "\n", response->trans_ts);
+
+	struct timeval timestamp_tv = { .tv_sec = response->trans_ts };
+	struct tm    * timestamp_tm = localtime(&timestamp_tv.tv_sec);
+	char tmbuf[26];
+	strftime(tmbuf, sizeof(tmbuf), "%FT%T%z", timestamp_tm);
+	printf("ISO-8601: %s\n", tmbuf);
 }
