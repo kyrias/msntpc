@@ -6,6 +6,7 @@
 #include <unistd.h> // close
 #include <sys/socket.h>
 #include <arpa/inet.h> // sockaddr_in, htons, inet_aton
+#include <netdb.h> // struct addrinfo
 
 #include "msntpc.h"
 
@@ -75,9 +76,9 @@
 
 
 int main(int argc, char *argv[]) {
-	char * server = "79.136.86.176";
+	char * server_addr = "79.136.86.176";
 	if (argc == 2) {
-		server = argv[1];
+		server_addr = argv[1];
 	}
 
 	uint8_t sntp_request[SNTP_DATA_LEN] = {0};
@@ -85,8 +86,8 @@ int main(int argc, char *argv[]) {
 
 	sntp_request[0] = SNTP_LI_ALARM_CONDITION | SNTP_VERSION | SNTP_MODE_CLIENT;
 
-	printf("Requesting current time from: %s\n", server);
-	ssize_t size = send_request(server, sntp_request, sntp_response);
+	printf("Requesting current time from: %s\n", server_addr);
+	ssize_t size = send_request(server_addr, sntp_request, sntp_response);
 	if (size != SNTP_DATA_LEN) {
 		fprintf(stderr, "Invalid response length: %zu, should be %d\n", size, SNTP_DATA_LEN);
 		exit(2);
@@ -96,17 +97,13 @@ int main(int argc, char *argv[]) {
 }
 
 
-ssize_t send_request(char * server_ip, uint8_t * request, uint8_t * response) {
-	struct sockaddr_in server = {
-		.sin_family = AF_INET,
-		.sin_port = htons(123),
-	};
-
-	if (inet_aton(server_ip, &server.sin_addr) == 0) {
-		fprintf(stderr, "Could not parse server IP: %s\n", server_ip);
+ssize_t send_request(char * server_addr, uint8_t * request, uint8_t * response) {
+	struct addrinfo * addr;
+	if (getaddrinfo(server_addr, "123", 0, &addr)) {
+		perror("send_request");
 	}
 
-	int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	int sock = socket(addr->ai_family, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock < 0) {
 		printf("Socket creation failed.\n");
 	}
@@ -114,13 +111,12 @@ ssize_t send_request(char * server_ip, uint8_t * request, uint8_t * response) {
 	int timeout = SNTP_RECV_TIMEOUT;
 	setsockopt( sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 
-	if (sendto(sock, request, SNTP_DATA_LEN, 0, (const struct sockaddr *)&server, sizeof(server)) < 0) {
+	if (sendto(sock, request, SNTP_DATA_LEN, 0, addr->ai_addr, addr->ai_addrlen) < 0) {
 		perror("send_request");
 	}
 
-	socklen_t server_size = sizeof(server);
 	ssize_t size = 0;
-	if ((size = recvfrom(sock, response, SNTP_DATA_LEN, 0, (struct sockaddr *)&server, &server_size)) < 0) {
+	if ((size = recvfrom(sock, response, SNTP_DATA_LEN, 0, addr->ai_addr, &addr->ai_addrlen)) < 0) {
 		perror("recvfrom");
 	}
 
