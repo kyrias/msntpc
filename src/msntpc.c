@@ -1,12 +1,12 @@
-#include <stdlib.h> // exit
-#include <stdio.h> // printf
-#include <string.h> // memcpy
-#include <stdint.h> // uint8_t, uint32_t
 #include <inttypes.h> // PRIu8, PRIu32
+#include <netdb.h> // getaddrinfo, struct addrinfo
+#include <netinet/in.h> // IPPROTO_UDP
+#include <stdlib.h> // exit
+#include <stdint.h> // uint8_t, uint32_t
+#include <stdio.h> // printf, fprintf, perror
+#include <string.h> // memcpy
+#include <sys/socket.h> // socket, setsockopt, SOCK_DGRAM, sendto, recvfrom
 #include <unistd.h> // close
-#include <sys/socket.h>
-#include <arpa/inet.h> // sockaddr_in, htons, inet_aton
-#include <netdb.h> // struct addrinfo
 
 #include "msntpc.h"
 
