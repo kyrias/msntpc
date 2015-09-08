@@ -29,7 +29,8 @@ int main(int argc, char *argv[]) {
 		exit(2);
 	}
 
-	print_response(sntp_response);
+	sntp_packet * packet = parse_response(sntp_response);
+	print_response(packet);
 }
 
 
@@ -60,16 +61,33 @@ ssize_t send_request(char * server_addr, uint8_t * request, uint8_t * response) 
 	return size;
 }
 
+sntp_packet * parse_response(uint8_t * response) {
+	sntp_packet * packet = malloc(sizeof(*packet));
 
-void print_response(uint8_t * response) {
-	printf("Response mode: %" PRIu8 "\n", (response[0] & SNTP_MODE_MASK));
 
-	uint32_t timestamp;
-	memcpy(&timestamp, (response + SNTP_TRANS_TS_OFFSET), sizeof(timestamp));
-	printf("UNIX epoch: %" PRIu32 "\n", (uint32_t)(ntohl(timestamp) - DIFF_UNIX_SNTP));
+	uint8_t li_vn_mode;
+	memcpy(&li_vn_mode, response, 1);
 
+	packet->li = SNTP_PACKET_LEAP_INDICATOR(response);
+	packet->ver = SNTP_PACKET_VERSION(response);
+	packet->mode = SNTP_PACKET_MODE(response);
 
 	uint8_t stratum;
 	memcpy(&stratum, (response + SNTP_STRATUM_OFFSET), sizeof(stratum));
-	printf("Stratum: %" PRIu8 "\n", stratum);
+	packet->stratum = stratum;
+
+
+	uint32_t timestamp;
+	memcpy(&timestamp, (response + SNTP_TRANS_TS_OFFSET), sizeof(timestamp));
+	packet->trans_ts = ntohl(timestamp) - DIFF_UNIX_SNTP;
+
+	return packet;
+}
+
+void print_response(sntp_packet * response) {
+	printf("Leap indicator: %s\n", li_strings[response->li]);
+	printf("Version number: %" PRIu8 "\n", response->ver);
+	printf("Response mode: %s\n", mode_strings[response->mode]);
+	printf("Stratum: %" PRIu8 "\n", response->stratum);
+	printf("UNIX epoch: %" PRIu32 "\n", response->trans_ts);
 }

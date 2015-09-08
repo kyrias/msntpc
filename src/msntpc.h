@@ -37,6 +37,39 @@
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
+typedef enum {
+	NO_WARNING,
+	LAST_SIXTYONE,
+	LAST_FIFTYNINE,
+	ALARM_CONDITION,
+} leap_indicator;
+
+const static char * li_strings[] = {
+	[NO_WARNING] = "No warning",
+	[LAST_SIXTYONE] = "Last minute has 61 seconds",
+	[LAST_FIFTYNINE] = "Last minute has 59 seconds",
+	[ALARM_CONDITION] = "Alarm condition (clock not synchronized)",
+};
+
+const static char * mode_strings[] = {
+	[0] = "Reserved",
+	[1] = "Symmetric active",
+	[2] = "Symmetric passive",
+	[3] = "Client",
+	[4] = "Server",
+	[5] = "Broadcast",
+	[6] = "Reserved for NTP control message",
+	[7] = "Reserved for private use",
+};
+
+typedef struct sntp_packet {
+	leap_indicator li;
+	uint8_t        ver;
+	uint8_t        mode;
+	uint8_t        stratum;
+	uint32_t       trans_ts;
+} sntp_packet;
+
 #define SNTP_DATA_LEN 48
 
 #define SNTP_LI_NO_WARN         (0x00 << 6)
@@ -55,6 +88,10 @@
 #define SNTP_STRATUM_SECONDARY_MIN 0x02
 #define SNTP_STRATUM_SECONDARY_MAX 0x0F
 
+// Macros for getting out specific values from packet fields
+#define SNTP_PACKET_LEAP_INDICATOR(PACKET) (PACKET[0] >> 6)
+#define SNTP_PACKET_VERSION(PACKET) ((PACKET[0] & 0x38) >> 3)
+#define SNTP_PACKET_MODE(PACKET) (PACKET[0] & 0x07)
 
 #define SNTP_RECV_TIMEOUT           3000
 
@@ -66,4 +103,5 @@
 
 
 ssize_t send_request(char *, uint8_t *, uint8_t *);
-void print_response(uint8_t *);
+sntp_packet * parse_response(uint8_t * response);
+void print_response(sntp_packet *);

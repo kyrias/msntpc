@@ -1,7 +1,7 @@
 CC = clang
 
 CFLAGS += -O2 -std=c11 -ggdb -fstack-protector-all -Wl,-z,relro -Wl,-z,now -fPIE -pie
-CFLAGS += -Werror -Weverything -Wno-unused-macros
+CFLAGS += -Werror -Weverything -Wno-unused-macros -Wno-padded
 CFLAGS += -D_DEFAULT_SOURCE
 
 all: msntpc
