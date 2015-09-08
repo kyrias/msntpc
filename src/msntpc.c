@@ -36,24 +36,24 @@ int main(int argc, char *argv[]) {
 ssize_t send_request(char * server_addr, uint8_t * request, uint8_t * response) {
 	struct addrinfo * addr;
 	if (getaddrinfo(server_addr, "123", 0, &addr)) {
-		perror("send_request");
+		perror("send_request/getaddrinfo");
 	}
 
 	int sock = socket(addr->ai_family, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock < 0) {
-		printf("Socket creation failed.\n");
+		perror("send_request/socket");
 	}
 
 	int timeout = SNTP_RECV_TIMEOUT;
 	setsockopt( sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 
 	if (sendto(sock, request, SNTP_DATA_LEN, 0, addr->ai_addr, addr->ai_addrlen) < 0) {
-		perror("send_request");
+		perror("send_request/sendto");
 	}
 
 	ssize_t size = 0;
 	if ((size = recvfrom(sock, response, SNTP_DATA_LEN, 0, addr->ai_addr, &addr->ai_addrlen)) < 0) {
-		perror("recvfrom");
+		perror("send_request/recvfrom");
 	}
 
 	close(sock);
