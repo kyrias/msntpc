@@ -44,8 +44,8 @@ ssize_t send_request(char * server_addr, uint8_t * request, uint8_t * response) 
 		perror("send_request/socket");
 	}
 
-	int timeout = SNTP_RECV_TIMEOUT;
-	setsockopt( sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+	struct timeval timeout = { .tv_sec = SNTP_RECV_TIMEOUT };
+	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
 	if (sendto(sock, request, SNTP_DATA_LEN, 0, addr->ai_addr, addr->ai_addrlen) < 0) {
 		perror("send_request/sendto");
