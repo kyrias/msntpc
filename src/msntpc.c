@@ -76,7 +76,7 @@
 
 
 int main(int argc, char *argv[]) {
-	char * server_addr = "79.136.86.176";
+	char * server_addr = "0.pool.ntp.org";
 	if (argc == 2) {
 		server_addr = argv[1];
 	}
