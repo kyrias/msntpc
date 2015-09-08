@@ -66,7 +66,6 @@ ssize_t send_request(char * server_addr, uint8_t * request, uint8_t * response) 
 sntp_packet * parse_response(uint8_t * response) {
 	sntp_packet * packet = malloc(sizeof(*packet));
 
-
 	uint8_t li_vn_mode;
 	memcpy(&li_vn_mode, response, 1);
 
@@ -77,7 +76,6 @@ sntp_packet * parse_response(uint8_t * response) {
 	uint8_t stratum;
 	memcpy(&stratum, (response + SNTP_STRATUM_OFFSET), sizeof(stratum));
 	packet->stratum = stratum;
-
 
 	uint32_t timestamp;
 	memcpy(&timestamp, (response + SNTP_TRANS_TS_OFFSET), sizeof(timestamp));
