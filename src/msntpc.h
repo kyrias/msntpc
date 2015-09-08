@@ -84,10 +84,6 @@ typedef struct sntp_packet {
 #define SNTP_MODE_BROADCAST 0x05
 #define SNTP_MODE_MASK      0x07
 
-#define SNTP_STRATUM_PRIMARY       0x01
-#define SNTP_STRATUM_SECONDARY_MIN 0x02
-#define SNTP_STRATUM_SECONDARY_MAX 0x0F
-
 // Macros for getting out specific values from packet fields
 #define SNTP_PACKET_LEAP_INDICATOR(PACKET) (PACKET[0] >> 6)
 #define SNTP_PACKET_VERSION(PACKET) ((PACKET[0] & 0x38) >> 3)
