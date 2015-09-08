@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
 
 	sntp_request[0] = SNTP_LI_ALARM_CONDITION | SNTP_VERSION | SNTP_MODE_CLIENT;
 
+	printf("Requesting current time from: %s\n", server);
 	ssize_t size = send_request(server, sntp_request, sntp_response);
 	if (size != SNTP_DATA_LEN) {
 		fprintf(stderr, "Invalid response length: %zu, should be %d\n", size, SNTP_DATA_LEN);
