@@ -67,6 +67,7 @@ typedef struct sntp_packet {
 	uint8_t        ver;
 	uint8_t        mode;
 	uint8_t        stratum;
+	int8_t         precision;
 	uint32_t       trans_ts;
 } sntp_packet;
 
@@ -91,8 +92,9 @@ typedef struct sntp_packet {
 
 #define SNTP_RECV_TIMEOUT           3000
 
-#define SNTP_TRANS_TS_OFFSET 32 /* 4 fields * 8 rows */
-#define SNTP_STRATUM_OFFSET  1
+#define SNTP_TRANS_TS_OFFSET  32 /* 4 fields * 8 rows */
+#define SNTP_STRATUM_OFFSET   1
+#define SNTP_PRECISION_OFFSET 3
 
 // Seconds between 1900 (SNTP epoch) and 1970 (UNIX epoch)
 #define DIFF_UNIX_SNTP 2208988800

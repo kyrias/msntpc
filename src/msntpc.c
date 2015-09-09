@@ -77,6 +77,10 @@ sntp_packet * parse_response(uint8_t * response) {
 	memcpy(&stratum, (response + SNTP_STRATUM_OFFSET), sizeof(stratum));
 	packet->stratum = stratum;
 
+	int8_t precision;
+	memcpy(&precision, (response + SNTP_PRECISION_OFFSET), sizeof(precision));
+	packet->precision = precision;
+
 	uint32_t timestamp;
 	memcpy(&timestamp, (response + SNTP_TRANS_TS_OFFSET), sizeof(timestamp));
 	packet->trans_ts = ntohl(timestamp) - DIFF_UNIX_SNTP;
@@ -89,6 +93,7 @@ void print_response(sntp_packet * response) {
 	printf("Version number: %" PRIu8 "\n",              response->ver);
 	printf(" Response mode: %s\n",         mode_strings[response->mode]);
 	printf("       Stratum: %" PRIu8 "\n",              response->stratum);
+	printf("     Precision: %" PRId8 "\n",              response->precision);
 	printf("    UNIX epoch: %" PRIu32 "\n",             response->trans_ts);
 
 	struct timeval timestamp_tv = { .tv_sec = response->trans_ts };
