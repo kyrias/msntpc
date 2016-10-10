@@ -14,7 +14,7 @@
 
 
 int main(int argc, char *argv[]) {
-	char * server_addr = "0.pool.ntp.org";
+	static char * server_addr = "0.arch.pool.ntp.org";
 	if (argc == 2) {
 		server_addr = argv[1];
 	}
